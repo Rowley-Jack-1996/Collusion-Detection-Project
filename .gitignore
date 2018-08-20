@@ -1,9 +1,11 @@
-/CollusionDetection/Output/
-/CollusionDetection/build/
-/CollusionDetection/Data/
-/CollusionDetection/dist/
-/CollusionDetection/nbproject/
-/CollusionDetection/text/
+CollusionDetection/Output/
+CollusionDetection/build/
+CollusionDetection/Data/
+CollusionDetection/dist/
+CollusionDetection/nbproject/
+CollusionDetection/text/
+CollusionDetection/build.xml
+CollusionDetection/manifest.mf
 *.class
 *.log
 *.ctxt
