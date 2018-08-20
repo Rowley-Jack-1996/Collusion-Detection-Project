@@ -249,12 +249,13 @@ public class Interface extends JFrame{
             }
         });
         loadingWind.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        loadingWind.setLayout(new BoxLayout(loadingWind.getContentPane(), BoxLayout.Y_AXIS));
+        //loadingWind.setLayout(new GridLayout(3, 1, 2, 2));
+        //loadingWind.setLayout(new BoxLayout(loadingWind.getContentPane(), BoxLayout.Y_AXIS));
         
         JPanel loadingWindPnl = new JPanel();
         loadingWindPnl.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        loadingWindPnl.setLayout(new BoxLayout(loadingWindPnl, BoxLayout.Y_AXIS));
-        loadingWindPnl.setPreferredSize(new Dimension(250, 100));
+        loadingWindPnl.setLayout(new GridLayout(3, 1, 2, 2));
+        loadingWindPnl.setAlignmentX(Component.LEFT_ALIGNMENT);
         loadingWind.add(loadingWindPnl);
         
         loadingBar = new JProgressBar(0, lengthOfTask);
@@ -276,7 +277,7 @@ public class Interface extends JFrame{
         loadingCounterPnl.setBorder(padding);
         loadingWindPnl.add(loadingCounterPnl);
         
-        Label CounterText = new Label("Current Progress : ");
+        JLabel CounterText = new JLabel("Current Progress : ", SwingConstants.LEFT);
         loadingCounterPnl.add(CounterText);
         LoadingWindCounter = new Label("0/" + Integer.toString(lengthOfTask));
         loadingCounterPnl.add(LoadingWindCounter);
