@@ -98,7 +98,7 @@ public class Interface extends JFrame{
         sourceFilesNames.removeAll();
         sourceFilesNames.setListData(FilesListTxt);
     }
-    
+     
     public void generateInputInterface() {
         Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
         Dimension BrowseButtonSize = new Dimension(50,20);
@@ -244,6 +244,7 @@ public class Interface extends JFrame{
                 }
             }
         });
+        //loadingWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         loadingWind.setLayout(new BoxLayout(loadingWind.getContentPane(), BoxLayout.Y_AXIS));
         loadingBar = new JProgressBar(0, lengthOfTask);
@@ -337,6 +338,7 @@ public class Interface extends JFrame{
                 }
             }
         });
+        //outputWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         outputWind.setLayout(new BoxLayout(outputWind.getContentPane(), BoxLayout.Y_AXIS));
         
