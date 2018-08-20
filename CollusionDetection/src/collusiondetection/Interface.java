@@ -32,6 +32,9 @@ import javax.swing.event.ListSelectionListener;
  * @author Jack
  */
 public class Interface extends JFrame{
+    //---------- Overall Variables
+    private int x = 200;
+    private int y = 200;
     //---------- Variables for Input Interface
     ArrayList<File> DirFileList;
     SourceCodeLoader scl;
@@ -47,8 +50,8 @@ public class Interface extends JFrame{
     //---------- Variables for Loading Interface
     JFrame loadingWind;
     JProgressBar loadingBar;
-    Label TimeLeft;
-    Label LoadingWindCounter;
+    JLabel TimeLeft;
+    JLabel LoadingWindCounter;
     long startTime;
     //---------- Variables for Output Interface
     String[][] OutputNameList;
@@ -110,6 +113,13 @@ public class Interface extends JFrame{
         
         inputWind = new JFrame("Java Collusion Input");
         inputWind.setResizable(false);
+        inputWind.setLocation(x, y);
+        inputWind.addComponentListener(new ComponentAdapter() {
+            public void componentMoved(ComponentEvent e) {
+                x = inputWind.getLocation().x;
+                y = inputWind.getLocation().y;
+            }
+        });
         inputWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         inputWind.setLayout(new BoxLayout(inputWind.getContentPane(), BoxLayout.Y_AXIS));
@@ -248,14 +258,23 @@ public class Interface extends JFrame{
                 }
             }
         });
+        loadingWind.setLocation(x, y);
+        loadingWind.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                x = loadingWind.getLocation().x;
+                y = loadingWind.getLocation().y;
+            }
+        });
         loadingWind.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         //loadingWind.setLayout(new GridLayout(3, 1, 2, 2));
         //loadingWind.setLayout(new BoxLayout(loadingWind.getContentPane(), BoxLayout.Y_AXIS));
         
         JPanel loadingWindPnl = new JPanel();
         loadingWindPnl.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        loadingWindPnl.setLayout(new GridLayout(3, 1, 2, 2));
+        loadingWindPnl.setLayout(new GridLayout(3, 1, 4, 4));
         loadingWindPnl.setAlignmentX(Component.LEFT_ALIGNMENT);
+        loadingWindPnl.setPreferredSize(new Dimension(250, 100));
         loadingWind.add(loadingWindPnl);
         
         loadingBar = new JProgressBar(0, lengthOfTask);
@@ -264,22 +283,26 @@ public class Interface extends JFrame{
         loadingWindPnl.add(loadingBar);
         
         JPanel timeContainer = new JPanel(); 
-        timeContainer.setBorder(padding);
+        //timeContainer.setBorder(padding);
         timeContainer.setLayout(new BoxLayout(timeContainer, BoxLayout.X_AXIS));
         loadingWindPnl.add(timeContainer);
-        Label timeRemainingText = new Label("Time Remaining:");
+        JLabel timeRemainingText = new JLabel("Time Remaining : ");
+        Font f = timeRemainingText.getFont();
+        timeRemainingText.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
         timeContainer.add(timeRemainingText);
-        TimeLeft = new Label("0:00");
+        TimeLeft = new JLabel("0:00");
+        TimeLeft.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
         timeContainer.add(TimeLeft);
         
         JPanel loadingCounterPnl = new JPanel();
         loadingCounterPnl.setLayout(new BoxLayout(loadingCounterPnl, BoxLayout.X_AXIS));
-        loadingCounterPnl.setBorder(padding);
         loadingWindPnl.add(loadingCounterPnl);
         
         JLabel CounterText = new JLabel("Current Progress : ", SwingConstants.LEFT);
+        CounterText.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
         loadingCounterPnl.add(CounterText);
-        LoadingWindCounter = new Label("0/" + Integer.toString(lengthOfTask));
+        LoadingWindCounter = new JLabel("0/" + Integer.toString(lengthOfTask));
+        LoadingWindCounter.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
         loadingCounterPnl.add(LoadingWindCounter);
         
         loadingWind.pack();
@@ -291,11 +314,11 @@ public class Interface extends JFrame{
     public void updateProgressBarLoadingInterface(int newValue, int total) {
         loadingBar.setValue(newValue);
         long currTime = System.currentTimeMillis();
-        int amountLeft = total - newValue;
-        long timeTaken = currTime - startTime;
-        long estTimeLeft = (timeTaken / newValue) * amountLeft;
-        long mins = (estTimeLeft / 1000) / 60;
-        long secs = (estTimeLeft / 1000) % 60;
+        double percentComplete = (double) newValue / (double) total;
+        double totalTime = (1.0 / percentComplete) * (currTime - startTime);
+        double remaining = totalTime - (currTime - startTime);
+        long mins = (long) ((remaining / 1000) / 60);
+        long secs = (long) ((remaining / 1000) % 60);
         String time;
         
         if (secs >= 10) {
@@ -387,7 +410,14 @@ public class Interface extends JFrame{
                 }
             }
         });
-        loadingWind.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        outputWind.setLocation(x, y);
+        outputWind.addComponentListener(new ComponentAdapter() {
+            public void componentMoved(ComponentEvent e) {
+                x = outputWind.getLocation().x;
+                y = outputWind.getLocation().y;
+            }
+        });
+        outputWind.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         
         outputWind.setLayout(new BoxLayout(outputWind.getContentPane(), BoxLayout.Y_AXIS));
         

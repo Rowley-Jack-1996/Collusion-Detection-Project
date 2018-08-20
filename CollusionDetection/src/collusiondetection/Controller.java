@@ -97,7 +97,8 @@ public class Controller {
         inf.generateLoadingInterface(totalToDo);
         for (int a=1;a<scList.size();a++) {
             for(int b=0;b<a;b++) {
-                new Results(a,b).run();
+                new Results(a,b);
+                currentAmountDone++;
                 inf.updateProgressBarLoadingInterface(currentAmountDone, totalToDo);
             }
         }
