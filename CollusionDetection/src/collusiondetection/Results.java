@@ -8,7 +8,6 @@ package collusiondetection;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +41,13 @@ public class Results {
         writeToFile();
     }
     
+    public Results(SubResult[] results, int source, int target, int largestSWSim) {
+        this.results = results;
+        this.source = source;
+        this.target = target;
+        this.largestSWSim = largestSWSim;
+    }
+    
     public boolean writeToFile() {
         //Make Directory for to store class comparisons
         //OUTPUTDIR = %CurrDir%/Output
@@ -53,11 +59,13 @@ public class Results {
             results[i].writeToFile(f.getAbsolutePath() ,"A " + i);
         }
         try {
-            FileWriter fwriter = new FileWriter("Results");
+            FileWriter fwriter = new FileWriter(f.getPath() + "\\Results.txt");
             /*
             1-SubResultsLength
             2-source,target
             3-largestSWResult
+            //4-NoOfFields
+            //5-NoOfMatchingLines/NoOfLines
             */
             fwriter.write(Integer.toString(results.length) + "\r\n");
             fwriter.write(Integer.toString(source) + "," + Integer.toString(target) + "\r\n");

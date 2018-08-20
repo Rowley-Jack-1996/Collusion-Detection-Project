@@ -253,6 +253,7 @@ public class Interface extends JFrame{
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 if (JOptionPane.showConfirmDialog(loadingWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
+                    Controller.closeInit = true;
                     delDir(Controller.OUTPUTDIR);
                     System.exit(0);
                 }
@@ -405,6 +406,7 @@ public class Interface extends JFrame{
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 if (JOptionPane.showConfirmDialog(outputWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
+                    Controller.closeInit = true;
                     delDir(Controller.OUTPUTDIR);
                     System.exit(0);
                 }
@@ -494,8 +496,8 @@ public class Interface extends JFrame{
         Label OverallEditDist;
         ArrayList<int[]> DDList; //0 is Source index; 1 is target index; 2 is length
         
-        public ResultsInterface(int index1, int index2) {
-            result = new Results(index1, index2);
+        public ResultsInterface(int index1, int index2, Results result) {
+            this.result = result;
             Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
         
             ResultsWind = new JFrame();
@@ -832,6 +834,7 @@ public class Interface extends JFrame{
                 
                 String sourceName = (String) sourceCodeListOutput.getSelectedValue();
                 String targetName = (String) targetCodeListOutput.getSelectedValue();
+                
                 int index1 = 0,index2 = 0;
                 
                 for (int i = 0;i<Controller.scList.size();i++) {
@@ -842,7 +845,7 @@ public class Interface extends JFrame{
                         index2 = i;
                     }
                 }
-                new ResultsInterface(index1, index2);
+                new ResultsInterface(index1, index2, OutputLoader.loadOutput(sourceName, targetName));
             }
             
         }

@@ -25,6 +25,14 @@ public class SubResult {
         this.className = className;
     }
     
+    public SubResult(String className, double overallDLevenResult, int[] overallSWHighSim, int[][] chainLengthA, boolean flipped) {
+        this.className = className;
+        this.overallDLevenResult = overallDLevenResult;
+        this.overallSWHighSim = overallSWHighSim;
+        this.chainLengthA = chainLengthA;
+        this.flipped = flipped;
+    }
+    
     public boolean writeToFile(String subdir, String name){
         String linetoWrite;
         File f = new File(subdir + "/" + name + ".txt");

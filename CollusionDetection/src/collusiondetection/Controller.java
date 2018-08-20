@@ -17,11 +17,12 @@ public class Controller {
     static Results[][] resultTable;
     static SourceCodeLoader sCodeLoader;
     public static boolean Started = false;
+    public static boolean closeInit = false;
     public static int currentAmountDone = 0;
     public static int totalToDo;
     
     //Debug Variables
-    public static final String scInputTextDefault = "C:\\Users\\Jack\\Dropbox\\3rd Year Project\\Test Case\\SourceCode";
+    public static final String scInputTextDefault = "C:\\Users\\Jack\\Dropbox\\3rd Year Project\\Test Case - Copy\\SourceCode";
     public static final String cbInputTextDefault = null;
 
     public static void main(String[] args) throws InterruptedException {
@@ -63,6 +64,8 @@ public class Controller {
             Thread.sleep(250);
         } while (currentAmountDone < totalToDo);
         
+        //OutputLoader.loadOutput("10000002", "10000000");
+        
         //Display selection interface
         inf.generateOutputInterface();
         inf.closeLoadingInterface();
@@ -97,9 +100,11 @@ public class Controller {
         inf.generateLoadingInterface(totalToDo);
         for (int a=1;a<scList.size();a++) {
             for(int b=0;b<a;b++) {
-                new Results(a,b);
-                currentAmountDone++;
-                inf.updateProgressBarLoadingInterface(currentAmountDone, totalToDo);
+                if (!closeInit) {
+                    new Results(a,b);
+                    currentAmountDone++;
+                    inf.updateProgressBarLoadingInterface(currentAmountDone, totalToDo);
+                }
             }
         }
     }
