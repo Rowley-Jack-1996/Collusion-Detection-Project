@@ -218,6 +218,16 @@ public class Interface extends JFrame{
         inputWind.setVisible(true);
     }
     
+    private boolean delDir(File DirToDel) {
+        File[] Files = DirToDel.listFiles();
+        if (Files != null) {
+            for (File f:Files) {
+                delDir(f);
+            }
+        }
+        return DirToDel.delete();
+    }
+    
     public void generateLoadingInterface(int lengthOfTask) {
         //Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
         //Dimension BrowseButtonSize = new Dimension(50,20);
@@ -225,7 +235,16 @@ public class Interface extends JFrame{
         
         loadingWind = new JFrame("Loading");
         loadingWind.setResizable(false);
-        loadingWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        loadingWind.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (JOptionPane.showConfirmDialog(loadingWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
+                    delDir(Controller.OUTPUTDIR);
+                    System.exit(0);
+                }
+            }
+        });
+        //loadingWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         loadingWind.setLayout(new BoxLayout(loadingWind.getContentPane(), BoxLayout.Y_AXIS));
         loadingBar = new JProgressBar(0, lengthOfTask);
@@ -310,7 +329,16 @@ public class Interface extends JFrame{
         outputWind = new JFrame();
         outputWind.setTitle("Results");
         outputWind.setResizable(false);
-        outputWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        outputWind.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (JOptionPane.showConfirmDialog(outputWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
+                    delDir(Controller.OUTPUTDIR);
+                    System.exit(0);
+                }
+            }
+        });
+        //outputWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         outputWind.setLayout(new BoxLayout(outputWind.getContentPane(), BoxLayout.Y_AXIS));
         
