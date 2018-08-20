@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author Jack
  */
-public class Results implements Runnable{
+public class Results {
     private SubResult[] results;
     int source, target;
     private int largestSWSim; //Largest Smith Waterman Similarity result across all subresults
@@ -27,10 +27,6 @@ public class Results implements Runnable{
         this.source = source;
         this.target = target;
         this.largestSWSim = 0;
-    }
-    
-    @Override
-    public void run() {
         results = new SubResult[getMaxClassLength()];
         for (int i=0;i<results.length;i++) {
             results[i] = new SubResult(Controller.scList.get(source).getClassName(i));
@@ -38,14 +34,12 @@ public class Results implements Runnable{
             results[i].overallSmWm(Controller.scList.get(source).getClassRaw(i), Controller.scList.get(target).getClassRaw(i));
             results[i].smithWatermanCall(Controller.scList.get(source).getClassRaw(i), Controller.scList.get(target).getClassRaw(i));
         }
-        
         for(int i=0;i<results.length;i++) {
             if (results[i].getSWOverallSim()[2] > largestSWSim) {
                 largestSWSim = results[i].getSWOverallSim()[2];
             }
         }
         writeToFile();
-        Controller.currentAmountDone++;
     }
     
     public boolean writeToFile() {

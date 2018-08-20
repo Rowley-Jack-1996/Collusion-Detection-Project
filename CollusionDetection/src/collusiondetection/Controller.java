@@ -59,7 +59,7 @@ public class Controller {
         //Now process results
         processSC();
         do {
-            inf.updateProgressBarLoadingInterface(currentAmountDone);
+            inf.updateProgressBarLoadingInterface(currentAmountDone, totalToDo);
             Thread.sleep(250);
         } while (currentAmountDone < totalToDo);
         
@@ -97,8 +97,9 @@ public class Controller {
         inf.generateLoadingInterface(totalToDo);
         for (int a=1;a<scList.size();a++) {
             for(int b=0;b<a;b++) {
-                new Results(a,b).run();
-                inf.updateProgressBarLoadingInterface(currentAmountDone);
+                new Results(a,b);
+                currentAmountDone++;
+                inf.updateProgressBarLoadingInterface(currentAmountDone, totalToDo);
             }
         }
     }

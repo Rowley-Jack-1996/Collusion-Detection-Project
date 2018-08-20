@@ -14,11 +14,13 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -30,6 +32,9 @@ import javax.swing.event.ListSelectionListener;
  * @author Jack
  */
 public class Interface extends JFrame{
+    //---------- Overall Variables
+    private int x = 200;
+    private int y = 200;
     //---------- Variables for Input Interface
     ArrayList<File> DirFileList;
     SourceCodeLoader scl;
@@ -45,12 +50,14 @@ public class Interface extends JFrame{
     //---------- Variables for Loading Interface
     JFrame loadingWind;
     JProgressBar loadingBar;
+    JLabel TimeLeft;
+    JLabel LoadingWindCounter;
+    long startTime;
     //---------- Variables for Output Interface
     String[][] OutputNameList;
     JFrame outputWind;
     JList sourceCodeListOutput;
     JList targetCodeListOutput;
-    //---------- Variables for the results interface
     
     public Interface(SourceCodeLoader scl) {
         this.scl = scl;
@@ -106,6 +113,13 @@ public class Interface extends JFrame{
         
         inputWind = new JFrame("Java Collusion Input");
         inputWind.setResizable(false);
+        inputWind.setLocation(x, y);
+        inputWind.addComponentListener(new ComponentAdapter() {
+            public void componentMoved(ComponentEvent e) {
+                x = inputWind.getLocation().x;
+                y = inputWind.getLocation().y;
+            }
+        });
         inputWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         inputWind.setLayout(new BoxLayout(inputWind.getContentPane(), BoxLayout.Y_AXIS));
@@ -218,27 +232,104 @@ public class Interface extends JFrame{
         inputWind.setVisible(true);
     }
     
+    private boolean delDir(File DirToDel) {
+        File[] Files = DirToDel.listFiles();
+        if (Files != null) {
+            for (File f:Files) {
+                delDir(f);
+            }
+        }
+        return DirToDel.delete();
+    }
+    
     public void generateLoadingInterface(int lengthOfTask) {
-        //Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
+        Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
         //Dimension BrowseButtonSize = new Dimension(50,20);
         //Dimension InputPnlDim = new Dimension(250, 50);
         
         loadingWind = new JFrame("Loading");
         loadingWind.setResizable(false);
-        loadingWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        loadingWind.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (JOptionPane.showConfirmDialog(loadingWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
+                    delDir(Controller.OUTPUTDIR);
+                    System.exit(0);
+                }
+            }
+        });
+        loadingWind.setLocation(x, y);
+        loadingWind.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                x = loadingWind.getLocation().x;
+                y = loadingWind.getLocation().y;
+            }
+        });
+        loadingWind.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        //loadingWind.setLayout(new GridLayout(3, 1, 2, 2));
+        //loadingWind.setLayout(new BoxLayout(loadingWind.getContentPane(), BoxLayout.Y_AXIS));
         
-        loadingWind.setLayout(new BoxLayout(loadingWind.getContentPane(), BoxLayout.Y_AXIS));
+        JPanel loadingWindPnl = new JPanel();
+        loadingWindPnl.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        loadingWindPnl.setLayout(new GridLayout(3, 1, 4, 4));
+        loadingWindPnl.setAlignmentX(Component.LEFT_ALIGNMENT);
+        loadingWindPnl.setPreferredSize(new Dimension(250, 100));
+        loadingWind.add(loadingWindPnl);
+        
         loadingBar = new JProgressBar(0, lengthOfTask);
         loadingBar.setValue(0);
-        loadingWind.add(loadingBar);
+        loadingBar.setStringPainted(true);
+        loadingWindPnl.add(loadingBar);
+        
+        JPanel timeContainer = new JPanel(); 
+        //timeContainer.setBorder(padding);
+        timeContainer.setLayout(new BoxLayout(timeContainer, BoxLayout.X_AXIS));
+        loadingWindPnl.add(timeContainer);
+        JLabel timeRemainingText = new JLabel("Time Remaining : ");
+        Font f = timeRemainingText.getFont();
+        timeRemainingText.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+        timeContainer.add(timeRemainingText);
+        TimeLeft = new JLabel("0:00");
+        TimeLeft.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+        timeContainer.add(TimeLeft);
+        
+        JPanel loadingCounterPnl = new JPanel();
+        loadingCounterPnl.setLayout(new BoxLayout(loadingCounterPnl, BoxLayout.X_AXIS));
+        loadingWindPnl.add(loadingCounterPnl);
+        
+        JLabel CounterText = new JLabel("Current Progress : ", SwingConstants.LEFT);
+        CounterText.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+        loadingCounterPnl.add(CounterText);
+        LoadingWindCounter = new JLabel("0/" + Integer.toString(lengthOfTask));
+        LoadingWindCounter.setFont(f.deriveFont(f.getStyle() ^ Font.BOLD));
+        loadingCounterPnl.add(LoadingWindCounter);
         
         loadingWind.pack();
         
         loadingWind.setVisible(true);
+        startTime = System.currentTimeMillis();
     }
     
-    public void updateProgressBarLoadingInterface(int newValue) {
+    public void updateProgressBarLoadingInterface(int newValue, int total) {
         loadingBar.setValue(newValue);
+        long currTime = System.currentTimeMillis();
+        double percentComplete = (double) newValue / (double) total;
+        double totalTime = (1.0 / percentComplete) * (currTime - startTime);
+        double remaining = totalTime - (currTime - startTime);
+        long mins = (long) ((remaining / 1000) / 60);
+        long secs = (long) ((remaining / 1000) % 60);
+        String time;
+        
+        if (secs >= 10) {
+            time = Long.toString(mins) + ":" + Long.toString(secs);
+        } else {
+            time = Long.toString(mins) + ":0" + Long.toString(secs);
+        }
+
+        
+        TimeLeft.setText(time);
+        LoadingWindCounter.setText(Integer.toString(newValue) + "/" + Integer.toString(total));
     }
     
     public void closeLoadingInterface() {
@@ -310,7 +401,23 @@ public class Interface extends JFrame{
         outputWind = new JFrame();
         outputWind.setTitle("Results");
         outputWind.setResizable(false);
-        outputWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        outputWind.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (JOptionPane.showConfirmDialog(outputWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
+                    delDir(Controller.OUTPUTDIR);
+                    System.exit(0);
+                }
+            }
+        });
+        outputWind.setLocation(x, y);
+        outputWind.addComponentListener(new ComponentAdapter() {
+            public void componentMoved(ComponentEvent e) {
+                x = outputWind.getLocation().x;
+                y = outputWind.getLocation().y;
+            }
+        });
+        outputWind.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         
         outputWind.setLayout(new BoxLayout(outputWind.getContentPane(), BoxLayout.Y_AXIS));
         
