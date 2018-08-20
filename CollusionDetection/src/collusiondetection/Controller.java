@@ -21,7 +21,7 @@ public class Controller {
     public static int totalToDo;
     
     //Debug Variables
-    public static final String scInputTextDefault = "C:\\Users\\Jack\\Dropbox\\3rd Year Project\\Test Case - Copy\\SourceCode";
+    public static final String scInputTextDefault = "C:\\Users\\Jack\\Dropbox\\3rd Year Project\\Test Case\\SourceCode";
     public static final String cbInputTextDefault = null;
 
     public static void main(String[] args) throws InterruptedException {
@@ -59,7 +59,7 @@ public class Controller {
         //Now process results
         processSC();
         do {
-            inf.updateProgressBarLoadingInterface(currentAmountDone);
+            inf.updateProgressBarLoadingInterface(currentAmountDone, totalToDo);
             Thread.sleep(250);
         } while (currentAmountDone < totalToDo);
         
@@ -98,7 +98,7 @@ public class Controller {
         for (int a=1;a<scList.size();a++) {
             for(int b=0;b<a;b++) {
                 new Results(a,b).run();
-                inf.updateProgressBarLoadingInterface(currentAmountDone);
+                inf.updateProgressBarLoadingInterface(currentAmountDone, totalToDo);
             }
         }
     }

@@ -1,8 +1,9 @@
+/CollusionDetection/Output/
 /CollusionDetection/build/
 /CollusionDetection/Data/
 /CollusionDetection/dist/
 /CollusionDetection/nbproject/
-/CollusionDetection/text/]
+/CollusionDetection/text/
 *.class
 *.log
 *.ctxt

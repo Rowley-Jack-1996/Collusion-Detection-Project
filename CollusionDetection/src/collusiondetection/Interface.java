@@ -14,11 +14,13 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -45,12 +47,14 @@ public class Interface extends JFrame{
     //---------- Variables for Loading Interface
     JFrame loadingWind;
     JProgressBar loadingBar;
+    Label TimeLeft;
+    Label LoadingWindCounter;
+    long startTime;
     //---------- Variables for Output Interface
     String[][] OutputNameList;
     JFrame outputWind;
     JList sourceCodeListOutput;
     JList targetCodeListOutput;
-    //---------- Variables for the results interface
     
     public Interface(SourceCodeLoader scl) {
         this.scl = scl;
@@ -229,7 +233,7 @@ public class Interface extends JFrame{
     }
     
     public void generateLoadingInterface(int lengthOfTask) {
-        //Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
+        Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
         //Dimension BrowseButtonSize = new Dimension(50,20);
         //Dimension InputPnlDim = new Dimension(250, 50);
         
@@ -244,20 +248,64 @@ public class Interface extends JFrame{
                 }
             }
         });
-        //loadingWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
+        loadingWind.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         loadingWind.setLayout(new BoxLayout(loadingWind.getContentPane(), BoxLayout.Y_AXIS));
+        
+        JPanel loadingWindPnl = new JPanel();
+        loadingWindPnl.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        loadingWindPnl.setLayout(new BoxLayout(loadingWindPnl, BoxLayout.Y_AXIS));
+        loadingWindPnl.setPreferredSize(new Dimension(250, 100));
+        loadingWind.add(loadingWindPnl);
+        
         loadingBar = new JProgressBar(0, lengthOfTask);
         loadingBar.setValue(0);
-        loadingWind.add(loadingBar);
+        loadingBar.setStringPainted(true);
+        loadingWindPnl.add(loadingBar);
+        
+        JPanel timeContainer = new JPanel(); 
+        timeContainer.setBorder(padding);
+        timeContainer.setLayout(new BoxLayout(timeContainer, BoxLayout.X_AXIS));
+        loadingWindPnl.add(timeContainer);
+        Label timeRemainingText = new Label("Time Remaining:");
+        timeContainer.add(timeRemainingText);
+        TimeLeft = new Label("0:00");
+        timeContainer.add(TimeLeft);
+        
+        JPanel loadingCounterPnl = new JPanel();
+        loadingCounterPnl.setLayout(new BoxLayout(loadingCounterPnl, BoxLayout.X_AXIS));
+        loadingCounterPnl.setBorder(padding);
+        loadingWindPnl.add(loadingCounterPnl);
+        
+        Label CounterText = new Label("Current Progress : ");
+        loadingCounterPnl.add(CounterText);
+        LoadingWindCounter = new Label("0/" + Integer.toString(lengthOfTask));
+        loadingCounterPnl.add(LoadingWindCounter);
         
         loadingWind.pack();
         
         loadingWind.setVisible(true);
+        startTime = System.currentTimeMillis();
     }
     
-    public void updateProgressBarLoadingInterface(int newValue) {
+    public void updateProgressBarLoadingInterface(int newValue, int total) {
         loadingBar.setValue(newValue);
+        long currTime = System.currentTimeMillis();
+        int amountLeft = total - newValue;
+        long timeTaken = currTime - startTime;
+        long estTimeLeft = (timeTaken / newValue) * amountLeft;
+        long mins = (estTimeLeft / 1000) / 60;
+        long secs = (estTimeLeft / 1000) % 60;
+        String time;
+        
+        if (secs >= 10) {
+            time = Long.toString(mins) + ":" + Long.toString(secs);
+        } else {
+            time = Long.toString(mins) + ":0" + Long.toString(secs);
+        }
+
+        
+        TimeLeft.setText(time);
+        LoadingWindCounter.setText(Integer.toString(newValue) + "/" + Integer.toString(total));
     }
     
     public void closeLoadingInterface() {
@@ -338,7 +386,7 @@ public class Interface extends JFrame{
                 }
             }
         });
-        //outputWind.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        loadingWind.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         
         outputWind.setLayout(new BoxLayout(outputWind.getContentPane(), BoxLayout.Y_AXIS));
         
