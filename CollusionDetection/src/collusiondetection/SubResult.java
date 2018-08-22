@@ -39,36 +39,17 @@ public class SubResult {
         
         try {
             FileWriter fwriter = new FileWriter(f);
-            //New Line Character is \r\n
             /*  File Format
             1- className
             2- overallDLevenResult
-                3- 1st length of overallSWResult <comma> 2nd Length of ""
-                4- data from overallSWResult with each column separeted with commas and rows with new lines
-            5- overall SWHighSim with the 3 values separeted with commas
-            6- 1st length of chainlengtha <comma> 2nd length of chainlengtha
-            7- chainlengtha in a similar manner as overallswresult
-            8- boolean result as 0 or 1 (false or true respective)
+            3- overall SWHighSim with the 3 values separeted with commas
+            4- 1st length of chainlengtha <comma> 2nd length of chainlengtha
+            5- chainlengtha in a similar manner as overallswresult
+            6- boolean result as 0 or 1 (false or true respective)
             */
-            
             fwriter.write(className + "\r\n");
             fwriter.write(Double.toString(overallDLevenResult) + "\r\n");
-            
-            //Need to compensate for a lack of data for this (Maybe print false if there is no data?)
-            /*
-            fwriter.write(Integer.toString(overallSWResult.length) + "," + Integer.toString(overallSWResult[0].length));
-            for (int a=0;a<overallSWResult.length;a++)  {
-                linetoWrite = "";
-                for (int b=0;b<overallSWResult[a].length;b++) {
-                    linetoWrite = linetoWrite + Integer.toString(overallSWResult[a][b]) + ",";
-                }
-                linetoWrite = linetoWrite.substring(0, linetoWrite.length()-1) + "\r\n";
-                fwriter.write(linetoWrite);
-            }
-            */
             fwriter.write(Integer.toString(overallSWHighSim[0]) + "," + Integer.toString(overallSWHighSim[1]) + "," + Integer.toString(overallSWHighSim[2]) + "\r\n");
-            
-            //Need to compensate for a lack of data for this (Maybe print false if there is no data?)
             fwriter.write(Integer.toString(chainLengthA.length) + "," + Integer.toString(chainLengthA[0].length) + "\r\n");
             for (int a=0;a<chainLengthA.length;a++)  {
                 linetoWrite = "";
@@ -86,9 +67,8 @@ public class SubResult {
             
             fwriter.close();
         } catch (IOException e) {
-            
+            //To Do
         }
-        
         return true;
     }
     

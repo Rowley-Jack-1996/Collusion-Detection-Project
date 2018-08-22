@@ -5,9 +5,11 @@
  */
 package collusiondetection;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,6 +21,8 @@ public class Results {
     private SubResult[] results;
     int source, target;
     private int largestSWSim; //Largest Smith Waterman Similarity result across all subresults
+    private int[] NoOfSimilarLines;
+    private int[] TotalNoOfLines;
     public final int SOURCE = 0;
     public final int TARGET = 1;
     
@@ -26,13 +30,16 @@ public class Results {
         this.source = source;
         this.target = target;
         this.largestSWSim = 0;
-        results = new SubResult[getMaxClassLength()];
+        this.results = new SubResult[getMaxClassLength()];
+        this.NoOfSimilarLines = new int[results.length];
+        this.TotalNoOfLines = new int[results.length];
         for (int i=0;i<results.length;i++) {
             results[i] = new SubResult(Controller.scList.get(source).getClassName(i));
             results[i].dLevenCalc(Controller.scList.get(source).getClassRaw(i), Controller.scList.get(target).getClassRaw(i));
             results[i].overallSmWm(Controller.scList.get(source).getClassRaw(i), Controller.scList.get(target).getClassRaw(i));
-            results[i].smithWatermanCall(Controller.scList.get(source).getClassRaw(i), Controller.scList.get(target).getClassRaw(i));
+            results[i].smithWatermanCall(Controller.scList.get(source).getClassRaw(i), Controller.scList.get(target).getClassRaw(i)); //Populate ChainLengthA
         }
+        populateSimilarity();
         for(int i=0;i<results.length;i++) {
             if (results[i].getSWOverallSim()[2] > largestSWSim) {
                 largestSWSim = results[i].getSWOverallSim()[2];
@@ -49,12 +56,9 @@ public class Results {
     }
     
     public boolean writeToFile() {
-        //Make Directory for to store class comparisons
-        //OUTPUTDIR = %CurrDir%/Output
         String fileName = Controller.scList.get(source).sourceName + " --- " + Controller.scList.get(target).sourceName;
         File f = new File(Controller.OUTPUTDIR.getAbsoluteFile() + "\\" + fileName);
         f.mkdir();
-        //Make individual result file for the subresults inside directory
         for (int i=0;i<results.length;i++) {
             results[i].writeToFile(f.getAbsolutePath() ,"A " + i);
         }
@@ -64,19 +68,68 @@ public class Results {
             1-SubResultsLength
             2-source,target
             3-largestSWResult
-            //4-NoOfFields
-            //5-NoOfMatchingLines/NoOfLines
+            4-NoOfMatchingLines,more
+            5-NoOfTotalLines,more
             */
             fwriter.write(Integer.toString(results.length) + "\r\n");
             fwriter.write(Integer.toString(source) + "," + Integer.toString(target) + "\r\n");
             fwriter.write(Integer.toString(largestSWSim) + "\r\n");
+            
+            String outputTempText = "";
+            for (int i=0;i<NoOfSimilarLines.length;i++) {
+                outputTempText = outputTempText + Integer.toString(NoOfSimilarLines[i]) + ",";
+            }
+            fwriter.write(outputTempText.substring(0, outputTempText.length()-1) + "\r\n");
+            
+            outputTempText = "";
+            for (int i=0;i<TotalNoOfLines.length;i++) {
+                outputTempText = outputTempText + Integer.toString(TotalNoOfLines[i]) + ",";
+            }
+            fwriter.write(outputTempText.substring(0, outputTempText.length()-1));
             fwriter.close();
+            
+            //Controller.pw.println(recordText());
+            
         } catch (IOException ex) {
             Logger.getLogger(Results.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
         
         return true;
-    }    
+    }  
+    
+    private void populateSimilarity() {
+        for (int i=0;i<results.length;i++) {
+            for (int array=0;i<results[i].getChainLength().length;array++) {
+                if (array > (results[i].getChainLength().length - 1)) {
+                    break;
+                }
+                if (results[i].getChainLength()[array][2] > 0) {
+                    NoOfSimilarLines[i]+=results[i].getChainLength()[array][2];
+                    array+=results[i].getChainLength()[array][2];
+                }
+            }
+            TotalNoOfLines[i] = results[i].getChainLength().length;
+            Controller.similarityTable[source][target][i] = (double)NoOfSimilarLines[i] / (double)TotalNoOfLines[i];
+            System.out.println(Controller.similarityTable[source][target][i]);
+        }
+    }
+    
+    /*
+    private String recordText() {
+        String textOutput = Controller.scList.get(source).getSourceName() + "," + Controller.scList.get(target).getSourceName();
+        textOutput = textOutput + "/";
+        for (int num:NoOfSimilarLines) {
+            textOutput = textOutput + Integer.toString(num) + ",";
+        }
+        textOutput = textOutput.substring(0, textOutput.length()-1) + "/";
+        for (int num:TotalNoOfLines) {
+            textOutput = textOutput + Integer.toString(num) + ",";
+        }
+        textOutput = textOutput.substring(0, textOutput.length()-1);
+        return textOutput;
+    }
+    */
     
     /**
      *
@@ -97,10 +150,8 @@ public class Results {
     
     public String getClassText(int targetId, int index) {
         if (targetId == SOURCE) {
-            //return results[index].getSourceClass();
             return Controller.scList.get(source).getClassRaw(index);
         } else {
-            //return results[index].getTargetClass();
             return Controller.scList.get(target).getClassRaw(index);
         }
     }
@@ -151,6 +202,4 @@ public class Results {
     public String getTarget() {
         return Controller.scList.get(target).sourceName;
     }
-
-    
 }

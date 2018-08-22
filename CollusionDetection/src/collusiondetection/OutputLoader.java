@@ -16,9 +16,6 @@ import java.util.Scanner;
  * @author Jack
  */
 public class OutputLoader {
-    public static void OutputLoader() {
-    }
-    
     public static Results loadOutput(String a, String b) {
         
         //Setting File Filter
