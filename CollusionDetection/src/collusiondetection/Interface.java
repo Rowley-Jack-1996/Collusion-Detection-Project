@@ -893,7 +893,7 @@ public class Interface extends JFrame{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println(outputTabbedPane.getSelectedComponent().getName());
+            //System.out.println(outputTabbedPane.getSelectedComponent().getName());
             if (outputTabbedPane.getSelectedComponent().getName().equals("Sorted")) {
                 int index = sortedSCListOutput.getSelectedIndex();
                 

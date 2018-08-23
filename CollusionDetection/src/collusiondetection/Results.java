@@ -111,7 +111,7 @@ public class Results {
             }
             TotalNoOfLines[i] = results[i].getChainLength().length;
             Controller.similarityTable[source][target][i] = (double)NoOfSimilarLines[i] / (double)TotalNoOfLines[i];
-            System.out.println(Controller.similarityTable[source][target][i]);
+            //System.out.println(Controller.similarityTable[source][target][i]);
         }
     }
     

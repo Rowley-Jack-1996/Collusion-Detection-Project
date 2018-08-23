@@ -172,11 +172,13 @@ public class Controller {
             }
         }
         
+        /*
         for(int i=0;i<sortedSimilarityList.length;i++) {
             for (int a=0;a<sortedSimilarityList[i].length;a++) {
                 System.out.print(sortedSimilarityList[i][a] + " : ");
             }
             System.out.println("");
         }
+        */
     }
 }
