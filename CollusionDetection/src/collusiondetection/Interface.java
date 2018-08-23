@@ -7,6 +7,8 @@ package collusiondetection;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -20,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
@@ -56,8 +59,10 @@ public class Interface extends JFrame{
     //---------- Variables for Output Interface
     String[][] OutputNameList;
     JFrame outputWind;
+    JTabbedPane outputTabbedPane;
     JList sourceCodeListOutput;
     JList targetCodeListOutput;
+    JList sortedSCListOutput;
     
     public Interface(SourceCodeLoader scl) {
         this.scl = scl;
@@ -253,6 +258,7 @@ public class Interface extends JFrame{
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 if (JOptionPane.showConfirmDialog(loadingWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
+                    Controller.closeInit = true;
                     delDir(Controller.OUTPUTDIR);
                     System.exit(0);
                 }
@@ -405,6 +411,7 @@ public class Interface extends JFrame{
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 if (JOptionPane.showConfirmDialog(outputWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
+                    Controller.closeInit = true;
                     delDir(Controller.OUTPUTDIR);
                     System.exit(0);
                 }
@@ -421,10 +428,80 @@ public class Interface extends JFrame{
         
         outputWind.setLayout(new BoxLayout(outputWind.getContentPane(), BoxLayout.Y_AXIS));
         
+        outputTabbedPane = new JTabbedPane();
+        outputWind.add(outputTabbedPane);
+        outputTabbedPane.add("Tab 1", generateSortedOutput());
+        outputTabbedPane.add("Tab 2", generateTotalOutput());
+        
+        //--------------------------------------
+        Button ResultBtn = new Button("Results");
+        ResultBtn.addActionListener(new ResultBtnListener());
+        outputWind.add(ResultBtn);
+        
+        outputWind.pack();
+        outputWind.setVisible(true);
+    }
+    
+    private JPanel generateSortedOutput() {
+        Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
+        JPanel sortedOutputPnl = new JPanel();
+        sortedOutputPnl.setName("Sorted");
+        sortedOutputPnl.setBorder(padding);
+        sortedOutputPnl.setLayout(new BoxLayout(sortedOutputPnl, BoxLayout.X_AXIS));
+        
+        //----------Left Side----------//
+        JPanel LeftSideContainer = new JPanel();
+        LeftSideContainer.setLayout(new BoxLayout(LeftSideContainer, BoxLayout.Y_AXIS));
+        sortedOutputPnl.add(LeftSideContainer);
+        
+        JLabel sclbl = new JLabel("Source Code: ");
+        LeftSideContainer.add(sclbl);
+        
+        JScrollPane sourceCodeScroll = new JScrollPane();
+        LeftSideContainer.add(sourceCodeScroll);
+        
+        String[] scListString = SortedSCList();
+        
+        sortedSCListOutput = new JList(scListString);
+        sourceCodeScroll.setViewportView(sortedSCListOutput);
+        sortedSCListOutput.setSelectedIndex(0);
+        
+        //----------Right Side----------//
+        
+        return sortedOutputPnl;
+    }
+    
+    private String[] SortedSCList() {
+        String[] scListString = new String[Controller.sortedSimilarityList.length];
+        String tempStore = "";
+        String sourceName = "";
+        String targetName = "";
+        double perc = 0;
+        for (int i=0;i<Controller.sortedSimilarityList.length;i++) {
+            tempStore = "";
+            sourceName = Controller.scList.get((int)Controller.sortedSimilarityList[i][0]).getSourceName();
+            targetName = Controller.scList.get((int)Controller.sortedSimilarityList[i][1]).getSourceName();
+            tempStore = tempStore + sourceName + " - " + targetName + " - ";
+            perc = (round(Controller.sortedSimilarityList[i][2],2)) * 100;
+            tempStore = tempStore + Integer.toString((int) perc) + "%";
+            scListString[i] = tempStore;
+        }
+        return scListString;
+    }
+    
+    private static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
+    
+    private JPanel generateTotalOutput() {
+        Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
         JPanel MainContainer = new JPanel(); //Main Container
+        MainContainer.setName("Total");
         MainContainer.setBorder(padding);
         MainContainer.setLayout(new BoxLayout(MainContainer, BoxLayout.X_AXIS));
-        outputWind.add(MainContainer);
         
         //----------Left Side----------//
         JPanel LeftSideContainer = new JPanel();
@@ -463,7 +540,6 @@ public class Interface extends JFrame{
         targetCodeScroll.setViewportView(targetCodeListOutput);
         
         //--------------------------------------
-        //System.out.println(sourceCodeListOutput.getSelectedIndex());
         String source = (String)sourceCodeListOutput.getSelectedValue();
         int index = sourceCodeListOutput.getSelectedIndex();
         String[] targetCode = new String[OutputNameList[index].length - 1];
@@ -474,13 +550,8 @@ public class Interface extends JFrame{
   
         targetCodeListOutput.removeAll();
         targetCodeListOutput.setListData(targetCode);
-        //--------------------------------------
-        Button ResultBtn = new Button("Results");
-        ResultBtn.addActionListener(new ResultBtnListener());
-        outputWind.add(ResultBtn);
         
-        outputWind.pack();
-        outputWind.setVisible(true);
+        return MainContainer;
     }
     
     class ResultsInterface extends JFrame {
@@ -494,9 +565,9 @@ public class Interface extends JFrame{
         Label OverallEditDist;
         ArrayList<int[]> DDList; //0 is Source index; 1 is target index; 2 is length
         
-        public ResultsInterface(int index1, int index2) {
-            result = new Results(index1, index2);
-            Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
+        public ResultsInterface(int index1, int index2, Results result) {
+            this.result = result;
+            //Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
         
             ResultsWind = new JFrame();
             ResultsWind.setTitle("Results : " + Controller.scList.get(index1).getSourceName() + " - " + Controller.scList.get(index2).getSourceName());
@@ -822,31 +893,43 @@ public class Interface extends JFrame{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int x = sourceCodeListOutput.getSelectedIndex();
-            int y = targetCodeListOutput.getSelectedIndex();
-            
-            if (x == -1 || y == -1) {
-                JOptionPane.showMessageDialog(new JFrame(), "You have not selected a source and/or target");
+            //System.out.println(outputTabbedPane.getSelectedComponent().getName());
+            if (outputTabbedPane.getSelectedComponent().getName().equals("Sorted")) {
+                int index = sortedSCListOutput.getSelectedIndex();
+                
+                int source = (int)Controller.sortedSimilarityList[index][0];
+                int target = (int)Controller.sortedSimilarityList[index][1];
+                
+                new ResultsInterface(source, target, OutputLoader.loadOutput(
+                        Controller.scList.get(source).getSourceName(), 
+                        Controller.scList.get(target).getSourceName())
+                );
             } else {
-                //resultInfStorage.add(new ResultsInterface(ResultsTableAL.get(x)[y]));
+                int x = sourceCodeListOutput.getSelectedIndex();
+                int y = targetCodeListOutput.getSelectedIndex();
                 
-                String sourceName = (String) sourceCodeListOutput.getSelectedValue();
-                String targetName = (String) targetCodeListOutput.getSelectedValue();
-                int index1 = 0,index2 = 0;
+                if (x == -1 || y == -1) {
+                    JOptionPane.showMessageDialog(new JFrame(), "You have not selected a source and/or target");
+                } else {
+                    //resultInfStorage.add(new ResultsInterface(ResultsTableAL.get(x)[y]));
                 
-                for (int i = 0;i<Controller.scList.size();i++) {
-                    if (Controller.scList.get(i).getSourceName().equals(sourceName)) {
-                        index1 = i;
+                    String sourceName = (String) sourceCodeListOutput.getSelectedValue();
+                    String targetName = (String) targetCodeListOutput.getSelectedValue();
+                
+                    int index1 = 0,index2 = 0;
+                
+                    for (int i = 0;i<Controller.scList.size();i++) {
+                        if (Controller.scList.get(i).getSourceName().equals(sourceName)) {
+                            index1 = i;
+                        }
+                        if (Controller.scList.get(i).getSourceName().equals(targetName)) {
+                            index2 = i;
+                        }
                     }
-                    if (Controller.scList.get(i).getSourceName().equals(targetName)) {
-                        index2 = i;
-                    }
+                    new ResultsInterface(index1, index2,OutputLoader.loadOutput(sourceName, targetName));
                 }
-                new ResultsInterface(index1, index2);
             }
-            
         }
-        
     }
     
     class SCDirDocListen implements DocumentListener {
