@@ -15,10 +15,10 @@ enum resultType {
 
 public class Controller {
     public static final File OUTPUTDIR = new File(System.getProperty("user.dir") + "\\Output");
-    //public static File similartyRecord = new File(OUTPUTDIR.getPath() +"\\Record.txt");
-    //public static FileWriter fw;
-    //public static BufferedWriter bw;
-    //public static PrintWriter pw;
+    public static File OutputFile = new File(OUTPUTDIR.getPath() +"\\Output.txt");
+    public static FileWriter fw;
+    public static BufferedWriter bw;
+    public static PrintWriter pw;
     public static final double SIMILARITYNEEDED = 0.8;
     public static final int LINESREQUIRED = 3;
     public static ArrayList<SourceCode> scList;
@@ -34,7 +34,7 @@ public class Controller {
     public static int maxNumOfClassInputs = 0;
     
     //Debug Variables
-    public static final String scInputTextDefault = "C:\\Users\\Jack\\Dropbox\\3rd Year Project\\Test Case - Copy\\SourceCode";
+    public static final String scInputTextDefault = "C:\\Users\\Jack\\Dropbox\\3rd Year Project\\Test Case\\SourceCode";
     public static final String cbInputTextDefault = null;
 
     public static void main(String[] args) throws InterruptedException {
@@ -44,15 +44,15 @@ public class Controller {
         scList = new ArrayList();
         sCodeLoader = new SourceCodeLoader();       
         inf = new Interface(sCodeLoader);
-        /*
+        
         try {
-            fw = new FileWriter(similartyRecord, true);
+            fw = new FileWriter(OutputFile, true);
             bw = new BufferedWriter(fw);
             pw = new PrintWriter(bw);
         } catch (IOException ex) {
             Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
         }
-        */
+        
         //Generate Input Interface
         inf.generateInputInterface();
         
@@ -90,7 +90,8 @@ public class Controller {
         sortSimTable();
         
         //Display selection interface
-        //pw.close();
+        pw.println("<ENDOFFILE>");
+        pw.close();
         inf.generateOutputInterface();
         inf.closeLoadingInterface();
     }
@@ -127,12 +128,26 @@ public class Controller {
         for (int a=1;a<scList.size();a++) {
             for(int b=0;b<a;b++) {
                 if (!closeInit) {
-                    new Results(a,b);
+                    new Results(a,b,pw);
                     currentAmountDone++;
                     inf.updateProgressBarLoadingInterface(currentAmountDone, totalToDo);
+                } else {
+                    pw.close();
+                    delDir(OUTPUTDIR);
+                    System.exit(0);
                 }
             }
         }
+    }
+    
+    public static boolean delDir(File DirToDel) {
+        File[] Files = DirToDel.listFiles();
+        if (Files != null) {
+            for (File f:Files) {
+                delDir(f);
+            }
+        }
+        return DirToDel.delete();
     }
     
     private static void sortSimTable() {
@@ -171,14 +186,5 @@ public class Controller {
                 }
             }
         }
-        
-        /*
-        for(int i=0;i<sortedSimilarityList.length;i++) {
-            for (int a=0;a<sortedSimilarityList[i].length;a++) {
-                System.out.print(sortedSimilarityList[i][a] + " : ");
-            }
-            System.out.println("");
-        }
-        */
     }
 }

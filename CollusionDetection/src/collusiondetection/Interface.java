@@ -237,16 +237,6 @@ public class Interface extends JFrame{
         inputWind.setVisible(true);
     }
     
-    private boolean delDir(File DirToDel) {
-        File[] Files = DirToDel.listFiles();
-        if (Files != null) {
-            for (File f:Files) {
-                delDir(f);
-            }
-        }
-        return DirToDel.delete();
-    }
-    
     public void generateLoadingInterface(int lengthOfTask) {
         Border padding = BorderFactory.createEmptyBorder(5, 10, 5, 10);
         //Dimension BrowseButtonSize = new Dimension(50,20);
@@ -259,8 +249,6 @@ public class Interface extends JFrame{
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 if (JOptionPane.showConfirmDialog(loadingWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
                     Controller.closeInit = true;
-                    delDir(Controller.OUTPUTDIR);
-                    System.exit(0);
                 }
             }
         });
@@ -412,7 +400,7 @@ public class Interface extends JFrame{
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
                 if (JOptionPane.showConfirmDialog(outputWind, "Do you wish to exit the application?") == JOptionPane.YES_OPTION) {
                     Controller.closeInit = true;
-                    delDir(Controller.OUTPUTDIR);
+                    Controller.delDir(Controller.OUTPUTDIR);
                     System.exit(0);
                 }
             }
@@ -900,7 +888,7 @@ public class Interface extends JFrame{
                 int source = (int)Controller.sortedSimilarityList[index][0];
                 int target = (int)Controller.sortedSimilarityList[index][1];
                 
-                new ResultsInterface(source, target, OutputLoader.loadOutput(
+                new ResultsInterface(source, target, OutputLoader.loadOutputNotationBuffReader(
                         Controller.scList.get(source).getSourceName(), 
                         Controller.scList.get(target).getSourceName())
                 );
@@ -926,7 +914,7 @@ public class Interface extends JFrame{
                             index2 = i;
                         }
                     }
-                    new ResultsInterface(index1, index2,OutputLoader.loadOutput(sourceName, targetName));
+                    new ResultsInterface(index1, index2,OutputLoader.loadOutputNotationBuffReader(sourceName, targetName));
                 }
             }
         }

@@ -5,13 +5,7 @@
  */
 package collusiondetection;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -26,7 +20,7 @@ public class Results {
     public final int SOURCE = 0;
     public final int TARGET = 1;
     
-    public Results(int source, int target) {
+    public Results(int source, int target, PrintWriter pw) {
         this.source = source;
         this.target = target;
         this.largestSWSim = 0;
@@ -45,58 +39,40 @@ public class Results {
                 largestSWSim = results[i].getSWOverallSim()[2];
             }
         }
-        writeToFile();
+        writeToFile(pw);
     }
     
-    public Results(SubResult[] results, int source, int target, int largestSWSim) {
+    public Results(SubResult[] results, int source, int target, int largestSWSim, int[] NoOfSimiarLines, int[] TotalNoOfLines) {
         this.results = results;
         this.source = source;
         this.target = target;
         this.largestSWSim = largestSWSim;
     }
     
-    public boolean writeToFile() {
-        String fileName = Controller.scList.get(source).sourceName + " --- " + Controller.scList.get(target).sourceName;
-        File f = new File(Controller.OUTPUTDIR.getAbsoluteFile() + "\\" + fileName);
-        f.mkdir();
-        for (int i=0;i<results.length;i++) {
-            results[i].writeToFile(f.getAbsolutePath() ,"A " + i);
-        }
-        try {
-            FileWriter fwriter = new FileWriter(f.getPath() + "\\Results.txt");
-            /*
-            1-SubResultsLength
-            2-source,target
-            3-largestSWResult
-            4-NoOfMatchingLines,more
-            5-NoOfTotalLines,more
-            */
-            fwriter.write(Integer.toString(results.length) + "\r\n");
-            fwriter.write(Integer.toString(source) + "," + Integer.toString(target) + "\r\n");
-            fwriter.write(Integer.toString(largestSWSim) + "\r\n");
-            
-            String outputTempText = "";
-            for (int i=0;i<NoOfSimilarLines.length;i++) {
-                outputTempText = outputTempText + Integer.toString(NoOfSimilarLines[i]) + ",";
-            }
-            fwriter.write(outputTempText.substring(0, outputTempText.length()-1) + "\r\n");
-            
-            outputTempText = "";
-            for (int i=0;i<TotalNoOfLines.length;i++) {
-                outputTempText = outputTempText + Integer.toString(TotalNoOfLines[i]) + ",";
-            }
-            fwriter.write(outputTempText.substring(0, outputTempText.length()-1));
-            fwriter.close();
-            
-            //Controller.pw.println(recordText());
-            
-        } catch (IOException ex) {
-            Logger.getLogger(Results.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-        }
+    private void writeToFile(PrintWriter pw) {
+        //Set up main section and overall results
+        pw.println("<" + Controller.scList.get(source).sourceName + " --- " + Controller.scList.get(target).sourceName + ">");
+        pw.println("    " + "<Results>");
+        pw.println("        " + Integer.toString(results.length));
+        pw.println("        " + Integer.toString(source) + "," + Integer.toString(target));
+        pw.println("        " + Integer.toString(largestSWSim));
         
-        return true;
-    }  
+        String outputTempText = "";
+        for (int i=0;i<NoOfSimilarLines.length;i++) {
+            outputTempText = outputTempText + Integer.toString(NoOfSimilarLines[i]) + ",";
+        }
+        pw.println("        " + outputTempText.substring(0, outputTempText.length()-1));
+        
+        outputTempText = "";
+        for (int i=0;i<TotalNoOfLines.length;i++) {
+            outputTempText = outputTempText + Integer.toString(TotalNoOfLines[i]) + ",";
+        }
+        pw.println("        " + outputTempText.substring(0, outputTempText.length()-1));
+        //Write SubResults Info
+        for (int i=0;i<results.length;i++) {
+            results[i].writeToFileNotation(pw);
+        }
+    }
     
     private void populateSimilarity() {
         for (int i=0;i<results.length;i++) {

@@ -5,9 +5,7 @@
  */
 package collusiondetection;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  *
@@ -33,43 +31,26 @@ public class SubResult {
         this.flipped = flipped;
     }
     
-    public boolean writeToFile(String subdir, String name){
-        String linetoWrite;
-        File f = new File(subdir + "/" + name + ".txt");
+    public void writeToFileNotation(PrintWriter pw) {
+        pw.println("    " + "<" + className + ">");
+        pw.println("        " + Double.toString(overallDLevenResult));
+        pw.println("        " + Integer.toString(overallSWHighSim[0]) + "," + Integer.toString(overallSWHighSim[1]) + "," + Integer.toString(overallSWHighSim[2]));
+        pw.println("        " + Integer.toString(chainLengthA.length) + "," + Integer.toString(chainLengthA[0].length));
         
-        try {
-            FileWriter fwriter = new FileWriter(f);
-            /*  File Format
-            1- className
-            2- overallDLevenResult
-            3- overall SWHighSim with the 3 values separeted with commas
-            4- 1st length of chainlengtha <comma> 2nd length of chainlengtha
-            5- chainlengtha in a similar manner as overallswresult
-            6- boolean result as 0 or 1 (false or true respective)
-            */
-            fwriter.write(className + "\r\n");
-            fwriter.write(Double.toString(overallDLevenResult) + "\r\n");
-            fwriter.write(Integer.toString(overallSWHighSim[0]) + "," + Integer.toString(overallSWHighSim[1]) + "," + Integer.toString(overallSWHighSim[2]) + "\r\n");
-            fwriter.write(Integer.toString(chainLengthA.length) + "," + Integer.toString(chainLengthA[0].length) + "\r\n");
-            for (int a=0;a<chainLengthA.length;a++)  {
-                linetoWrite = "";
-                for (int b=0;b<chainLengthA[a].length;b++) {
-                    linetoWrite = linetoWrite + Integer.toString(chainLengthA[a][b]) + ",";
-                }
-                linetoWrite = linetoWrite.substring(0, linetoWrite.length()-1) + "\r\n";
-                fwriter.write(linetoWrite);
+        String linetoWrite;
+        for (int a=0;a<chainLengthA.length;a++)  {
+            linetoWrite = "";
+            for (int b=0;b<chainLengthA[a].length;b++) {
+                linetoWrite = linetoWrite + Integer.toString(chainLengthA[a][b]) + ",";
             }
-            if (flipped) {
-                fwriter.write("1\r\n");
-            } else {
-                fwriter.write("0\r\n");
-            }
-            
-            fwriter.close();
-        } catch (IOException e) {
-            //To Do
+            linetoWrite = linetoWrite.substring(0, linetoWrite.length()-1);
+            pw.println("        " + linetoWrite);
         }
-        return true;
+        if (flipped) {
+            pw.println("        " + "1");
+        } else {
+            pw.println("        " + "0");
+        }
     }
     
     public String getClassName() {
