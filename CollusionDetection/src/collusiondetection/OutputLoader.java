@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package collusiondetection;
 
 import java.io.BufferedReader;
@@ -18,6 +13,13 @@ import java.util.logging.Logger;
  * @author Jack
  */
 public class OutputLoader {
+    
+    /**
+     * Used to read from the output file and package the data read into a Results object to be used to display the results.
+     * @param a This is the name of the source code folder that you want to read.
+     * @param b This is the name of the target source code folder that you want to read.
+     * @return Returns an Results object with the relevant data.
+     */
     public static Results loadOutputNotationBuffReader(String a, String b) {
         boolean SectionNotFound = true;
         

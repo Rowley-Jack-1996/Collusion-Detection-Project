@@ -34,7 +34,7 @@ public class Controller {
     public static int maxNumOfClassInputs = 0;
     
     //Debug Variables
-    public static final String scInputTextDefault = "C:\\Users\\Jack\\Dropbox\\3rd Year Project\\Test Case\\SourceCode";
+    public static final String scInputTextDefault = "C:\\Users\\Jack\\Dropbox\\3rd Year Project\\Test Case - Copy\\SourceCode";
     public static final String cbInputTextDefault = null;
 
     public static void main(String[] args) throws InterruptedException {

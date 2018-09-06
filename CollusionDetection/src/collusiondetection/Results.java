@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package collusiondetection;
 
 import java.io.PrintWriter;
@@ -20,6 +15,12 @@ public class Results {
     public final int SOURCE = 0;
     public final int TARGET = 1;
     
+    /**
+     * Results constructor that is used when first generating the data and saving it to disk.
+     * @param source This is the source code number that is relative to the one stored in the scList in Controller.
+     * @param target This is the target code number that is relative to the one stored in the scList in Controller.
+     * @param pw This is the PrintWriter used to store the data. This must be the same PrintWriter and not a new instance every time.
+     */
     public Results(int source, int target, PrintWriter pw) {
         this.source = source;
         this.target = target;
@@ -42,6 +43,15 @@ public class Results {
         writeToFile(pw);
     }
     
+    /**
+     * Results Constructor used when reading the data from file to be used to display the results.
+     * @param results SubResults array.
+     * @param source This is the source code number that is relative to the one stored in the scList in Controller.
+     * @param target This is the target code number that is relative to the one stored in the scList in Controller.
+     * @param largestSWSim Largest Smith Waterman Similarity result across all SubResults.
+     * @param NoOfSimiarLines Integer array keeping track of the number of similar lines.
+     * @param TotalNoOfLines Integer array keeping track of the number of total lines.
+     */
     public Results(SubResult[] results, int source, int target, int largestSWSim, int[] NoOfSimiarLines, int[] TotalNoOfLines) {
         this.results = results;
         this.source = source;
@@ -49,6 +59,10 @@ public class Results {
         this.largestSWSim = largestSWSim;
     }
     
+    /**
+     * Writes the overall information to file and then calls to write the SubResult information.
+     * @param pw The same PrintWriter should be used so the information is written to one file only.
+     */
     private void writeToFile(PrintWriter pw) {
         //Set up main section and overall results
         pw.println("<" + Controller.scList.get(source).sourceName + " --- " + Controller.scList.get(target).sourceName + ">");
@@ -74,6 +88,11 @@ public class Results {
         }
     }
     
+    /**
+     * This method is used to calculate the number of similar lines against the
+     * number of total lines and save those results to the Controller
+     * similarity table as a double percentage.
+     */
     private void populateSimilarity() {
         for (int i=0;i<results.length;i++) {
             for (int array=0;i<results[i].getChainLength().length;array++) {
@@ -87,43 +106,35 @@ public class Results {
             }
             TotalNoOfLines[i] = results[i].getChainLength().length;
             Controller.similarityTable[source][target][i] = (double)NoOfSimilarLines[i] / (double)TotalNoOfLines[i];
-            //System.out.println(Controller.similarityTable[source][target][i]);
         }
     }
-    
-    /*
-    private String recordText() {
-        String textOutput = Controller.scList.get(source).getSourceName() + "," + Controller.scList.get(target).getSourceName();
-        textOutput = textOutput + "/";
-        for (int num:NoOfSimilarLines) {
-            textOutput = textOutput + Integer.toString(num) + ",";
-        }
-        textOutput = textOutput.substring(0, textOutput.length()-1) + "/";
-        for (int num:TotalNoOfLines) {
-            textOutput = textOutput + Integer.toString(num) + ",";
-        }
-        textOutput = textOutput.substring(0, textOutput.length()-1);
-        return textOutput;
-    }
-    */
     
     /**
-     *
-     * @param index Index of the desired sub result chain length
-     * @return Returns the chain length details 
-     * Primary Number - The line number of the primary source
-     * Secondary Number - 0 : The starting index of the chain on the secondary source
+     * This will return the Chain Length array for the specified Index of the SubResult.
+     * @param index Index of the desired SubResult chain length array.
+     * @return The chain length array.
+     * Primary Number - The line number of the primary source.
+     * Secondary Number - 0 : The starting index of the chain on the secondary source.
      * 1 : The length of the chain
      */
     public int[][] getChainLength(int index) {
         return results[index].getChainLength();
     }
     
-    //gets length of SubResults stored
+    /**
+     * Used to get the number of SubResults that are stored.
+     * @return The length of the SubResult array.
+     */
     public int getLength() {
         return results.length;
     }
     
+    /**
+     * This is used to get the source code text from the specified source code folder and class.
+     * @param targetId The index number of the target source code folder.
+     * @param index The index of the SubResult
+     * @return The source code that was compared.
+     */
     public String getClassText(int targetId, int index) {
         if (targetId == SOURCE) {
             return Controller.scList.get(source).getClassRaw(index);
@@ -132,17 +143,27 @@ public class Results {
         }
     }
     
+    /**
+     * Returns the class name of the specified SubResult
+     * @param index The index of the SubResult stored in the array.
+     * @return String containing the class name.
+     */
     public String getClassName(int index) {
         return results[index].getClassName();
     }
     
+    /**
+     * Returns the Damerau Levenshtein result for the specified SubResult.
+     * @param index The index of the SubResult stored in the array.
+     * @return The edit distance of the SubResult.
+     */
     public int getDLevenOverall(int index) {
         return results[index].getOvDLevenResult();
     }
     
     /**
      * Returns the largest value similarity produced by Smith Waterman from the sub results
-     * @return
+     * @return 
      */
     public int getSWOverallSim() {
         return largestSWSim;
@@ -157,6 +178,10 @@ public class Results {
         return results[index].getSWOverallSim()[2];
     }
     
+    /**
+     * 
+     * @return 
+     */
     public int getMaxClassLength() {
         int max = Controller.scList.get(source).getTotalClass();
         if (Controller.scList.get(source).getTotalClass() > max) max = Controller.scList.get(source).getTotalClass();
